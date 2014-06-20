@@ -41,7 +41,7 @@ class API(object):
     )
 
     def __init__(self, url, username, password,
-                 version='1.3.2.4', full_url=False, protocol='xmlrpc'):
+                 version='1.3.2.4', full_url=False, protocol='xmlrpc', xdebug=None, verbose=False):
         """
         This is the Base API class which other APIs have to subclass. By
         default the inherited classes also get the properties of this
@@ -109,12 +109,13 @@ class API(object):
         """
         assert protocol \
             in PROTOCOLS, "protocol must be %s" % ' OR '.join(PROTOCOLS)
-        self.url = str(full_url and url or expand_url(url, protocol))
+        self.url = str(full_url and url or expand_url(url, protocol, xdebug))
         self.username = username
         self.password = password
         self.protocol = protocol
         self.session = None
         self.client = None
+        self.verbose = verbose
 
     def connect(self):
         """
@@ -122,7 +123,7 @@ class API(object):
         but does not login. This could be used as a connection test
         """
         if self.protocol == 'xmlrpc':
-            self.client = ServerProxy(self.url, allow_none=True)
+            self.client = ServerProxy(self.url, allow_none=True, verbose=self.verbose)
         else:
             self.client = Client(self.url)
 
